@@ -1,7 +1,8 @@
 import logging
 import secrets
 import warnings
-from typing import Any, Annotated, Self, Literal
+from typing import Any, Annotated, Literal
+from typing_extensions import Self # 3.10 python moment
 
 from pydantic import (
     EmailStr,
@@ -87,7 +88,8 @@ class Settings(BaseSettings):
     @property
     def REDIS_URI(self) -> RedisDsn:
         return MultiHostUrl.build(
-            scheme=self.REDIS_HOST,
+            scheme="redis",
+            host=self.REDIS_HOST,
             port=self.REDIS_PORT,
         )
 
@@ -120,7 +122,6 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def _enforce_non_default_secrets(self) -> Self:
         self._check_default_secret("SECRET_KEY", self.SECRET_KEY)
-        self._check_default_secret("POSTGRES_PASSWORD", self.POSTGRES_PASSWORD)
 
         return self
 

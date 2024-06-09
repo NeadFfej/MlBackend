@@ -18,6 +18,7 @@ from core.redis.client import pool, get_redis_client
 from app.routers import api_router
 
 
+logger = settings.LOGGER
 current_file_path = Path(__file__).resolve()
 locales_path = current_file_path.parent / "locales"
 docs_development_security = HTTPBasic()
@@ -25,13 +26,11 @@ openapi_tags = json.loads(open(f"{locales_path}/tags_metadata.json", "r").read()
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
-    uvi_access_logger = logging.getLogger("uvicorn.access")
-    
+async def lifespan(app: FastAPI):    
     await init_models(drop_all=settings.DROP_TABLES)
     
     async with get_redis_client() as client:
-        uvi_access_logger.info(f"Redis ping returned with: {await client.ping()}.")
+        logger.info(f"Redis ping returned with: {await client.ping()}.")
 
     yield
 
@@ -91,3 +90,14 @@ async def get_swagger_documentation(_: str = Depends(__basic_admin_auth)):
 async def openapi(_: str = Depends(__basic_admin_auth)):
     return get_openapi(routes=app.routes, tags=openapi_tags)
 
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(
+        app="main:app",
+        host=settings.DOMAIN,
+        port=8000,
+        reload=settings.ENVIRONMENT == "local",
+        proxy_headers=not settings.ENVIRONMENT == "local",
+    )

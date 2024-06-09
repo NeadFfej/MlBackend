@@ -9,7 +9,7 @@ from core.configuration import settings
 
 
 logger = settings.LOGGER
-pool = aredis.ConnectionPool.from_url(settings.REDIS_URI)
+pool = aredis.ConnectionPool.from_url(str(settings.REDIS_URI))
 
 
 @asynccontextmanager
