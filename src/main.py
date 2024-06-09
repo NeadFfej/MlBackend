@@ -11,7 +11,10 @@ from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from starlette.middleware.cors import CORSMiddleware
 
-from core.settings import settings
+from core.configuration import settings
+from core.database.initiator import init_models
+from core.redis.client import pool, get_redis_client
+
 from app.routers import api_router
 
 
@@ -23,7 +26,16 @@ openapi_tags = json.loads(open(f"{locales_path}/tags_metadata.json", "r").read()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    ...
+    uvi_access_logger = logging.getLogger("uvicorn.access")
+    
+    await init_models(drop_all=settings.DROP_TABLES)
+    
+    async with get_redis_client() as client:
+        uvi_access_logger.info(f"Redis ping returned with: {await client.ping()}.")
+
+    yield
+
+    await pool.aclose()
 
 
 app = FastAPI(
