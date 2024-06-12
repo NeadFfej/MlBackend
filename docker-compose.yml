@@ -1,4 +1,3 @@
-version: "3.7"
 
 services:
     nginx:
@@ -25,10 +24,46 @@ services:
         depends_on:
             db:
                 condition: service_healthy
+        environment:
+            - ISLOCAL=False
         command:
             - "sh"
             - "-c"
             - "alembic upgrade head && python3 src/main.py"
+
+    worker:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        command: 
+            - "sh"
+            - "-c"
+            - "cd src && celery -A core.celery.worker.celery worker --loglevel=info"
+        networks:
+            - custom
+        environment:
+            - ISLOCAL=False
+            - CELERY_BROKER_URL=redis://${REDIS_HOST}:${REDIS_PORT}
+            - CELERY_RESULT_BACKEND=redis://${REDIS_HOST}:${REDIS_PORT}
+        depends_on:
+            - fastapi
+            - redis
+    
+    dashboard:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        command: celery --broker=redis://${REDIS_HOST}:${REDIS_PORT} flower --port=5555
+        networks:
+            - custom
+        ports:
+            - 5556:5555
+        environment:
+            - ISLOCAL=False
+            - CELERY_BROKER_URL=redis://${REDIS_HOST}:${REDIS_PORT}
+            - CELERY_RESULT_BACKEND=redis://${REDIS_HOST}:${REDIS_PORT}
+        depends_on:
+            - worker
 
     db:
         container_name: postgres_backendml

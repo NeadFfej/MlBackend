@@ -1,6 +1,9 @@
+import os
+import sys
 import logging
 import secrets
 import warnings
+from pathlib import Path
 from typing import Any, Annotated, Literal
 from typing_extensions import Self # 3.10 python moment
 
@@ -15,6 +18,16 @@ from pydantic import (
 )
 from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from dotenv import load_dotenv
+
+
+if os.getenv("ISLOCAL", "True").lower() == "true":
+    env_p = "local.env"
+else:
+    project_root = Path(__file__).resolve().parents[3]
+    env_p = os.path.join(project_root, ".env")
+
+load_dotenv(dotenv_path=env_p, override=True)
 
 
 def parse_cors(v: Any) -> list[str] | str:
@@ -27,7 +40,7 @@ def parse_cors(v: Any) -> list[str] | str:
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env", env_ignore_empty=True, extra="ignore"
+        env_file=env_p, env_ignore_empty=True, extra="ignore"
     )
     SECRET_KEY: str = secrets.token_urlsafe(32)
     # 60 minutes * 24 hours * N days = N days
@@ -84,14 +97,27 @@ class Settings(BaseSettings):
     REDIS_HOST: str
     REDIS_PORT: int
     
-    @computed_field 
-    @property
-    def REDIS_URI(self) -> RedisDsn:
+    def _redis_url(self) -> RedisDsn:
         return MultiHostUrl.build(
             scheme="redis",
             host=self.REDIS_HOST,
             port=self.REDIS_PORT,
         )
+    
+    @computed_field 
+    @property
+    def REDIS_URI(self) -> RedisDsn:
+        return self._redis_url()
+    
+    @computed_field 
+    @property
+    def CELERY_BROKER_URL(self) -> RedisDsn:
+        return self._redis_url()
+    
+    @computed_field 
+    @property
+    def CELERY_RESULT_BACKEND(self) -> RedisDsn:
+        return self._redis_url()
 
     SMTP_PORT: int
     SMTP_HOST: str
