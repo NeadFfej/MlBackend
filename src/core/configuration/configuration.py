@@ -7,12 +7,6 @@ from pathlib import Path
 from typing import Any, Annotated, Literal
 from typing_extensions import Self # 3.10 python moment
 
-if os.getenv("ISLOCAL", "True").lower() == "true":
-    env_p = "local.env"
-else:
-    project_root = Path(__file__).resolve().parents[3]
-    env_p = os.path.join(project_root, ".env")
-
 from pydantic import (
     EmailStr,
     AnyUrl,
@@ -26,6 +20,12 @@ from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from dotenv import load_dotenv
 
+
+if os.getenv("ISLOCAL", "True").lower() == "true":
+    env_p = "local.env"
+else:
+    project_root = Path(__file__).resolve().parents[3]
+    env_p = os.path.join(project_root, ".env")
 
 load_dotenv(dotenv_path=env_p, override=True)
 
