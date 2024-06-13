@@ -1,6 +1,10 @@
 [
     {
-        "name": "mlmodel",
-        "description": "MlModel endpoints"
+        "name": "pub_mlmodel",
+        "description": "Publick mlmodel endpoints"
+    },
+    {
+        "name": "per_mlmodel",
+        "description":"Personal mlmodel endpoints"
     }
 ]
