@@ -10,6 +10,7 @@
 * Start the stack with Docker Compose:
 
 ```bash
+cp example.env .env
 docker compose up -d
 ```
 

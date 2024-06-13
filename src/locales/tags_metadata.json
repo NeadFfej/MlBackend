@@ -1,6 +1,6 @@
 [
     {
-        "name": "user",
-        "description": "User endpoints"
+        "name": "mlmodel",
+        "description": "MlModel endpoints"
     }
 ]
