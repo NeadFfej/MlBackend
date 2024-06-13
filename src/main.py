@@ -9,6 +9,7 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
+from fastapi.responses import RedirectResponse
 from starlette.middleware.cors import CORSMiddleware
 
 from core.configuration import settings
@@ -47,6 +48,12 @@ app = FastAPI(
 
 app.include_router(api_router)
 
+
+if settings.ENVIRONMENT == "local":
+    @app.get("/")
+    async def root_redirect():
+        return RedirectResponse("/docs")
+    
 
 if settings.BACKEND_CORS_ORIGINS:
     app.add_middleware(
