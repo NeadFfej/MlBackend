@@ -1,5 +1,4 @@
 import json
-import logging
 import secrets
 from pathlib import Path
 from typing import Annotated
@@ -50,7 +49,7 @@ app.include_router(api_router)
 
 
 if settings.ENVIRONMENT == "local":
-    @app.get("/")
+    @app.get("/", include_in_schema=False)
     async def root_redirect():
         return RedirectResponse("/docs")
     
