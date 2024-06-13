@@ -23,7 +23,8 @@ async def use_publick_model(
     mlmodel_data: PublickModelData = Depends(PublickModelData.query_validator)
 ):
     # Предполагается, что будет использоваться sse для моделей
-    task = check_ml.delay(mlmodel_data.model_dump())
+    # А данные из Celery будут возвращаться через post запросы
+    task = check_ml.delay(text_request, mlmodel_data.model_dump())
     return {"task_id": task.id}
 
 
