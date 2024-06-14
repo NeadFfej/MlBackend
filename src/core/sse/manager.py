@@ -27,7 +27,7 @@ class SseManagerContext:
 
     def create_listener(self):
         user_uuid = uuid4().hex
-        self.listeners[user_uuid] = SseQueue()
+        self.listeners[user_uuid] = SseQueue(user_uuid)
         return user_uuid
 
     def delete_listener(self, user_uuid: str):
@@ -57,11 +57,15 @@ class BaseNotificationManager:
         self,
         token_data = Depends(validate_session),
     ) -> StreamingResponse:
+        need_token = False
         if not token_data:
+            need_token = True
             token, token_data = create_jwt_token(need_token_data=True)
         
         sse_response = await self.add_user(token_data["session"])
-        sse_response.set_cookie("access", token)
+        if need_token:
+            sse_response.set_cookie("access", token)
+        
         return sse_response
 
     async def add_user(self, user_id: int) -> StreamingResponse:

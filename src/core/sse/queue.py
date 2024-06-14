@@ -7,8 +7,9 @@ from core.redis.client import get_redis_client
 
 
 class SseQueue:
-    def __init__(self) -> None:
-        self._queue = asyncio.Queue()
+    def __init__(self, user_id) -> None:
+        self._user_id = user_id
+        self._queue = 'sse_queue:' + user_id
         self._ping_task = asyncio.create_task(self.ping())
 
     def __del__(self):
@@ -66,11 +67,13 @@ class SseQueue:
                 "comment": comment,
             }
         )
-        await self._queue.put(sse_event_text)
+        async with get_redis_client() as client:
+            await client.rpush(self._queue, sse_event_text)
 
     async def get_event(self) -> str:
-        event = await self._queue.get()
-        return event
+        async with get_redis_client() as client:
+            event = await client.blpop(self._queue)
+            return event[1]
 
     async def ping(self):
         while True:

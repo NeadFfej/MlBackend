@@ -30,12 +30,14 @@ async def use_publick_model(
     """
     Для просмотра результа лучше откройте sse соединение (ендпоинт ниже)
     """
+    need_token = False
     if not token_data:
+        need_token = True
         token, token_data = create_jwt_token(need_token_data=True)
         
     task = check_ml.delay(token_data["session"], text_request, mlmodel_data.model_dump())
     response = JSONResponse({"is_task_started": True, "task_id": task.id}, status_code=201)
-    if not token_data:
+    if need_token:
         response.set_cookie("access", token)
         
     return response
