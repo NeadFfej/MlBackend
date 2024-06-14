@@ -7,7 +7,7 @@ from app.depends import validate_csv
 api_router = APIRouter()
 
 
-@api_router.post("/personal/models/new")
+@api_router.post("/personal/models/new", include_in_schema=False)
 async def create_new_model(
     mlmodel_data: CreatePersonalModelData = Depends(),
     train_data: bytes = Depends(validate_csv),
@@ -16,7 +16,7 @@ async def create_new_model(
     raise NotImplementedError
 
 
-@api_router.post("/personal/models/use")
+@api_router.post("/personal/models/use", include_in_schema=False)
 async def use_personal_model(mlmodel_data: PersonalModelData) -> PersonalModelData:
     
     raise NotImplementedError
