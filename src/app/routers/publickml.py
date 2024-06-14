@@ -1,5 +1,6 @@
 from fastapi import Depends, Query, APIRouter
 from fastapi.responses import JSONResponse, StreamingResponse
+from celery.result import AsyncResult
 
 from app.schemas.mlmodel import PublickModelData, CreatePublickModelData
 from app.depends import validate_csv, get_session_validator
@@ -41,6 +42,12 @@ async def use_publick_model(
         response.set_cookie("access", token)
         
     return response
+
+
+@api_router.get("/publick/models/getresult/final")
+async def get_task_result(task_id: str):
+    async_result = AsyncResult(task_id)
+    return async_result.result
 
 
 @api_router.get("/publick/models/getresult/stream", response_class=TextEventStreamResponse)

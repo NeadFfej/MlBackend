@@ -3,13 +3,11 @@ import asyncio
 
 from core.utils.system import AppStatus
 from core.configuration import settings
-from core.redis.client import get_redis_client
 
 
 class SseQueue:
-    def __init__(self, user_id) -> None:
-        self._user_id = user_id
-        self._queue = 'sse_queue:' + user_id
+    def __init__(self) -> None:
+        self._queue = asyncio.Queue()
         self._ping_task = asyncio.create_task(self.ping())
 
     def __del__(self):
@@ -67,13 +65,11 @@ class SseQueue:
                 "comment": comment,
             }
         )
-        async with get_redis_client() as client:
-            await client.rpush(self._queue, sse_event_text)
+        await self._queue.put(sse_event_text)
 
     async def get_event(self) -> str:
-        async with get_redis_client() as client:
-            event = await client.blpop(self._queue)
-            return event[1]
+        event = await self._queue.get()
+        return event
 
     async def ping(self):
         while True:

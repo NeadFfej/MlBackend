@@ -27,7 +27,7 @@ class SseManagerContext:
 
     def create_listener(self):
         user_uuid = uuid4().hex
-        self.listeners[user_uuid] = SseQueue(user_uuid)
+        self.listeners[user_uuid] = SseQueue()
         return user_uuid
 
     def delete_listener(self, user_uuid: str):
@@ -50,8 +50,9 @@ class SseManagerContext:
 
 class BaseNotificationManager:
     # Данная реализация не будет адекватно работать при нескольких воркерах!
+    # Требуется убирать все данные в редис и локально только сопоставлять данные с редиса и соединения
     def __init__(self) -> None:
-        self.sse_managers: dict[int, SseManagerContext] = {}
+        self.sse_managers: dict[str, SseManagerContext] = {}
 
     async def __call__(
         self,
