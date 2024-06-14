@@ -46,6 +46,7 @@ class Settings(BaseSettings):
     # 60 minutes * 24 hours * N days = N days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 1
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 14
+    NGINX_ADDRESS: str
     DOMAIN: str = "localhost"
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
 
