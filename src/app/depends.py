@@ -15,7 +15,7 @@ def validate_csv(file: UploadFile):
 access_token_scheme = APIKeyCookie(
     name="access",
     scheme_name="Cookie access token",
-    description="Cookie access token",
+    description="`Не трогайте это поле, если не знаете, что оно делает.` ",
     auto_error=False,
 )
 
