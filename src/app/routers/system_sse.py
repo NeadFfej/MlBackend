@@ -1,3 +1,5 @@
+import json
+
 from fastapi import Body, APIRouter
 from fastapi.exceptions import HTTPException
 
@@ -20,7 +22,7 @@ async def create_event(
 
     await context_manager.create_event(
         event=event,
-        data=data,
+        data=json.loads(data),
         comment=comment,
     )
 

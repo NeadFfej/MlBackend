@@ -6,7 +6,11 @@ from fastapi import Query
 
 # Base Models Data
 class PublickModelData(BaseModel):
-    model: Literal[""]
+    name: Literal[
+        "train_data_50for",
+        "train_data_100for",
+        "train_data_200for"
+    ]
     
 
 class PersonalModelData(PublickModelData):
