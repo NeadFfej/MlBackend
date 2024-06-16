@@ -26,7 +26,7 @@ async def create_new_model(
 async def use_publick_model(
     token_data = Depends(validate_session),
     text_request: str = Query(min_length=10, max_length=10000),
-    mlmodel_data: PublickModelData = Depends(PublickModelData.query_validator)
+    mlmodel_data: PublickModelData = Depends(PublickModelData)
 ):
     """
     Для просмотра результа лучше откройте sse соединение (ендпоинт ниже)

@@ -1,9 +1,14 @@
 import time
 import json
 import requests
+from pathlib import Path
 
 from celery_config.worker import celery
 from core.configuration import settings
+
+
+file_path = Path(__file__).resolve()
+models_path = file_path.parents[3] / "mldata"
 
 
 @celery.task()
