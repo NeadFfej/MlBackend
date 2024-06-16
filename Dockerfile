@@ -10,6 +10,7 @@ WORKDIR /mackendml
 COPY poetry.lock pyproject.toml ./
 RUN pip install poetry && poetry config virtualenvs.create false && poetry install --no-dev
 
+COPY mldata /mackendml/mldata
 COPY config /mackendml/config
 COPY src /mackendml/src
 COPY alembic.ini /mackendml

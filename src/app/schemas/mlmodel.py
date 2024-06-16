@@ -6,19 +6,15 @@ from fastapi import Query
 
 # Base Models Data
 class PublickModelData(BaseModel):
-    size: Literal["small", "medium", "large"]
-    iterations: Literal[10, 100, 1000]
+    name: Literal[
+        "train_data_50for",
+        "train_data_100for",
+        "train_data_200for"
+    ]
     
-    @staticmethod # Bug fix with content_type, UploadFile and Depends in FastApi
-    def query_validator(
-        size: Literal["small", "medium", "large"] = Query(),
-        iterations: Literal["10", "100", "1000"] = Query(),
-    ):
-        return PublickModelData(size=size, iterations=int(iterations))
-
 
 class PersonalModelData(PublickModelData):
-    iterations: int = Field(ge=1, le=1000)
+    pass
 
 
 # Create CRUD Models Data
