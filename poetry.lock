@@ -3041,10 +3041,7 @@ files = [
     {file = "wrapt-1.16.0.tar.gz", hash = "sha256:5f370f952971e7d17c7d1ead40e49f32345a7f7a5373571ef44d800d06b1899d"},
 ]
 
-[extras]
-worker = []
-
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "664d8906f9834aaf8dd2c9816f33a9f371246ab8d6e3add3bd48d272f0852842"
+content-hash = "2c729d7425d04690d98024a7ce03437a84357b82dbe3fddccff34b242246fccc"

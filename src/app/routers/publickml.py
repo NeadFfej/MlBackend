@@ -1,5 +1,6 @@
-from fastapi import Depends, Query, APIRouter
+from fastapi import Depends, Body, APIRouter
 from fastapi.responses import JSONResponse, StreamingResponse
+from pydantic import constr
 from celery.result import AsyncResult
 
 from app.schemas.mlmodel import PublickModelData, CreatePublickModelData
@@ -22,11 +23,11 @@ async def create_new_model(
     raise NotImplementedError
 
 
-@api_router.get("/publick/models/use", status_code=201)
+@api_router.post("/publick/models/use", status_code=201)
 async def use_publick_model(
     token_data = Depends(validate_session),
-    text_request: str = Query(min_length=10, max_length=10000),
-    mlmodel_data: PublickModelData = Depends(PublickModelData.query_validator)
+    text_requests: list[constr(min_length=10)] = Body(min_length=1),
+    mlmodel_data: PublickModelData = Depends(PublickModelData)
 ):
     """
     Для просмотра результа лучше откройте sse соединение (ендпоинт ниже)
@@ -36,7 +37,7 @@ async def use_publick_model(
         need_token = True
         token, token_data = create_jwt_token(need_token_data=True)
         
-    task = check_ml.delay(token_data["session"], text_request, mlmodel_data.model_dump())
+    task = check_ml.delay(token_data["session"], text_requests, mlmodel_data.model_dump())
     response = JSONResponse({"is_task_started": True, "task_id": task.id}, status_code=201)
     if need_token:
         response.set_cookie("access", token)
