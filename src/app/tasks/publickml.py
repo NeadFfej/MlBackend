@@ -22,7 +22,7 @@ def check_ml(session: str, text_requests: list[str], model_data: dict):
         words = batch_request.split(" ")
         doc = nlp(batch_request)
         
-        batch_response = ['O' for i in range(len(words))]
+        batch_response = ['O' for _ in range(len(words))]
         for ent in doc.ents:
             batch_response[ent.start] = ent.label_
         
